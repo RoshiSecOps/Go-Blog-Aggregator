@@ -33,7 +33,7 @@ func write(c Config) error {
 	return os.WriteFile(fullpath, data, 0644)
 }
 
-func ReadConfig() (Config, error) {
+func Read() (Config, error) {
 	var config Config
 	fullpath, err := getConfigFilePath()
 	if err != nil {
@@ -52,9 +52,5 @@ func ReadConfig() (Config, error) {
 
 func (c *Config) SetUser(username string) error {
 	c.CurrentUserName = username
-	err := write(*c)
-	if err != nil {
-		return err
-	}
-	return nil
+	return write(*c)
 }

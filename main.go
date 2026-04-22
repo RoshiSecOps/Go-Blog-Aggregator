@@ -9,7 +9,7 @@ import (
 func main() {
 	var gatorfig config.Config
 	var err error
-	gatorfig, err = config.ReadConfig()
+	gatorfig, err = config.Read()
 	if err != nil {
 		fmt.Println(err)
 	}
