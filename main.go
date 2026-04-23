@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -18,7 +17,11 @@ func main() {
 	cmds.register("login", handlerLogin)
 	args := os.Args
 	if len(args) < 2 {
-		fmt.Println("Not enough arguments... Exiting!")
-		os.Exit(1)
+		log.Fatal("Not enough arguments... Exiting!")
+	}
+	cmd := command{name: args[1], arguments: args[2:]}
+	err = cmds.run(s, cmd)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
