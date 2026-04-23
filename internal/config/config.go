@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 )
 
 const configFileName = ".gatorconfig.json"
@@ -17,7 +18,7 @@ func getConfigFilePath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fullpath := dir + "/" + configFileName
+	fullpath := filepath.Join(dir, configFileName)
 	return fullpath, nil
 }
 

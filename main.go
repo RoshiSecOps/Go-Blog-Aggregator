@@ -1,17 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/RoshiSecOps/Go-Blog-Aggregator/internal/config"
 )
 
 func main() {
-	var gatorfig config.Config
-	var err error
-	gatorfig, err = config.Read()
+	cfg, err := config.Read()
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
-	gatorfig.SetUser("Lane")
+	s := &state{cfg: &cfg}
 }
