@@ -26,6 +26,7 @@ func main() {
 	cmds.register("login", handlerLogin)
 	cmds.register("register", handlerRegister)
 	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerUsers)
 	args := os.Args
 	if len(args) < 2 {
 		log.Fatal("Not enough arguments... Exiting!")
