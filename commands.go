@@ -4,9 +4,11 @@ import (
 	"fmt"
 
 	"github.com/RoshiSecOps/Go-Blog-Aggregator/internal/config"
+	"github.com/RoshiSecOps/Go-Blog-Aggregator/internal/database"
 )
 
 type state struct {
+	db  *database.Queries
 	cfg *config.Config
 }
 type command struct {

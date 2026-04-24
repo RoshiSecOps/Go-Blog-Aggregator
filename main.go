@@ -1,10 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"os"
 
 	"github.com/RoshiSecOps/Go-Blog-Aggregator/internal/config"
+	"github.com/RoshiSecOps/Go-Blog-Aggregator/internal/database"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -12,7 +16,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	s := &state{cfg: &cfg}
+	db, err := sql.Open("postgres", cfg.DbUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbQueries := database.New(db)
+	s := &state{cfg: &cfg, db: dbQueries}
 	cmds := &commands{handlers: make(map[string]func(*state, command) error)}
 	cmds.register("login", handlerLogin)
 	args := os.Args
