@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -49,5 +50,13 @@ func handlerRegister(s *state, cmd command) error {
 	fmt.Println("Created at: ", user.CreatedAt)
 	fmt.Println("Updated at: ", user.UpdatedAt)
 	fmt.Println("UUID: ", user.ID)
+	return nil
+}
+
+func handlerReset(s *state, cmd command) error {
+	err := s.db.ResetDb(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
 	return nil
 }
