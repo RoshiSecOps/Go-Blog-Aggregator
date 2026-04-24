@@ -24,6 +24,7 @@ func main() {
 	s := &state{cfg: &cfg, db: dbQueries}
 	cmds := &commands{handlers: make(map[string]func(*state, command) error)}
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
 	args := os.Args
 	if len(args) < 2 {
 		log.Fatal("Not enough arguments... Exiting!")
