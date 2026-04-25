@@ -75,3 +75,13 @@ func handlerUsers(s *state, cmd command) error {
 	}
 	return nil
 }
+
+func handlerFetchFeed(s *state, cmd command) error {
+	url := "https://www.wagslane.dev/index.xml"
+	feed, err := fetchFeed(context.Background(), url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(feed)
+	return nil
+}
