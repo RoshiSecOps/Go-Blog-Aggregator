@@ -85,3 +85,33 @@ func handlerFetchFeed(s *state, cmd command) error {
 	fmt.Println(feed)
 	return nil
 }
+
+func handlerAddFeed(s *state, cmd command) error {
+	if len(cmd.arguments) < 2 {
+		return fmt.Errorf("Not enough arguments, provide Feed name and URL")
+	}
+	feedName := cmd.arguments[0]
+	feedurl := cmd.arguments[1]
+	username := s.cfg.CurrentUserName
+	user, err := s.db.GetUser(context.Background(), username)
+	if err != nil {
+		return err
+	}
+	createdAt := time.Now()
+	updatedAt := time.Now()
+	feedId := uuid.New()
+	userId := user.ID
+	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+		ID: feedId, CreatedAt: createdAt, UpdatedAt: updatedAt, Name: feedName, Url: feedurl, UserID: userId,
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Println(feed.Name)
+	fmt.Println(feed.ID)
+	fmt.Println(feed.Url)
+	fmt.Println(feed.CreatedAt)
+	fmt.Println(feed.UpdatedAt)
+	fmt.Println(feed.UserID)
+	return nil
+}
