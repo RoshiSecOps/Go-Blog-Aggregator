@@ -101,8 +101,15 @@ func handlerAddFeed(s *state, cmd command) error {
 	updatedAt := time.Now()
 	feedId := uuid.New()
 	userId := user.ID
+	followId := uuid.New()
 	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
 		ID: feedId, CreatedAt: createdAt, UpdatedAt: updatedAt, Name: feedName, Url: feedurl, UserID: userId,
+	})
+	if err != nil {
+		return err
+	}
+	_, err = s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID: followId, CreatedAt: createdAt, UpdatedAt: updatedAt, UserID: userId, FeedID: feedId,
 	})
 	if err != nil {
 		return err
@@ -126,5 +133,48 @@ func handlerFeeds(s *state, cmd command) error {
 		fmt.Println(feed.Url)
 		fmt.Println(feed.Username)
 	}
+	return nil
+}
+
+func handlerFollow(s *state, cmd command) error {
+	if len(cmd.arguments) < 1 {
+		return fmt.Errorf("Not enough arguments, please provide url")
+	}
+	feedUrl := cmd.arguments[0]
+	feed, err := s.db.GetFeed(context.Background(), feedUrl)
+	if err != nil {
+		return err
+	}
+	currentUserName := s.cfg.CurrentUserName
+	currentUser, err := s.db.GetUser(context.Background(), currentUserName)
+	if err != nil {
+		return err
+	}
+	createdAt := time.Now()
+	updatedAt := time.Now()
+	followId := uuid.New()
+	follow, err := s.db.CreateFeedFollow(context.Background(),
+		database.CreateFeedFollowParams{ID: followId, CreatedAt: createdAt, UpdatedAt: updatedAt, UserID: currentUser.ID, FeedID: feed.ID})
+	if err != nil {
+		return err
+	}
+	fmt.Println(follow.FeedName)
+	fmt.Println(follow.UserName)
+	return nil
+}
+
+func handlerFollows(s *state, cmd command) error {
+	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil {
+		return err
+	}
+	feeds, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
+	if err != nil {
+		return err
+	}
+	for _, feed := range feeds {
+		fmt.Println(feed.FeedName)
+	}
+	fmt.Println("Followed by: ", s.cfg.CurrentUserName)
 	return nil
 }
