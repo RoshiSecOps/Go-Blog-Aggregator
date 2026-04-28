@@ -32,6 +32,7 @@ func main() {
 	cmds.register("feeds", handlerFeeds)
 	cmds.register("follow", middlewareLoggedIn(handlerFollow))
 	cmds.register("following", middlewareLoggedIn(handlerFollows))
+	cmds.register("unfollow", middlewareLoggedIn(handlerUnfollow))
 	args := os.Args
 	if len(args) < 2 {
 		log.Fatal("Not enough arguments... Exiting!")
