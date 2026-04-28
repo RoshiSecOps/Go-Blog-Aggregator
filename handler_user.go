@@ -86,17 +86,12 @@ func handlerFetchFeed(s *state, cmd command) error {
 	return nil
 }
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) < 2 {
 		return fmt.Errorf("Not enough arguments, provide Feed name and URL")
 	}
 	feedName := cmd.arguments[0]
 	feedurl := cmd.arguments[1]
-	username := s.cfg.CurrentUserName
-	user, err := s.db.GetUser(context.Background(), username)
-	if err != nil {
-		return err
-	}
 	createdAt := time.Now()
 	updatedAt := time.Now()
 	feedId := uuid.New()
@@ -136,7 +131,7 @@ func handlerFeeds(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.arguments) < 1 {
 		return fmt.Errorf("Not enough arguments, please provide url")
 	}
@@ -145,16 +140,11 @@ func handlerFollow(s *state, cmd command) error {
 	if err != nil {
 		return err
 	}
-	currentUserName := s.cfg.CurrentUserName
-	currentUser, err := s.db.GetUser(context.Background(), currentUserName)
-	if err != nil {
-		return err
-	}
 	createdAt := time.Now()
 	updatedAt := time.Now()
 	followId := uuid.New()
 	follow, err := s.db.CreateFeedFollow(context.Background(),
-		database.CreateFeedFollowParams{ID: followId, CreatedAt: createdAt, UpdatedAt: updatedAt, UserID: currentUser.ID, FeedID: feed.ID})
+		database.CreateFeedFollowParams{ID: followId, CreatedAt: createdAt, UpdatedAt: updatedAt, UserID: user.ID, FeedID: feed.ID})
 	if err != nil {
 		return err
 	}
@@ -163,11 +153,7 @@ func handlerFollow(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollows(s *state, cmd command) error {
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil {
-		return err
-	}
+func handlerFollows(s *state, cmd command, user database.User) error {
 	feeds, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		return err
@@ -175,6 +161,6 @@ func handlerFollows(s *state, cmd command) error {
 	for _, feed := range feeds {
 		fmt.Println(feed.FeedName)
 	}
-	fmt.Println("Followed by: ", s.cfg.CurrentUserName)
+	fmt.Println("Followed by: ", user.Name)
 	return nil
 }
