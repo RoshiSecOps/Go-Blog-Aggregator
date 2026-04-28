@@ -15,3 +15,6 @@ SELECT feeds.name, feeds.url, users.name as username
 from feeds
 INNER JOIN users
     on feeds.user_id = users.id;
+
+-- name: GetFeed :one
+SELECT * from feeds where feeds.url = $1;
