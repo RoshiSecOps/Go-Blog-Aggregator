@@ -2,13 +2,16 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/RoshiSecOps/Go-Blog-Aggregator/internal/database"
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 func handlerLogin(s *state, cmd command) error {
@@ -191,6 +194,31 @@ func handlerFollows(s *state, cmd command, user database.User) error {
 	return nil
 }
 
+func handlerBrowse(s *state, cmd command, user database.User) error {
+	var limit int
+	userId := user.ID
+	if len(cmd.arguments) > 0 {
+		limitNum, err := strconv.Atoi(cmd.arguments[0])
+		if err != nil {
+			return err
+		}
+		limit = limitNum
+	} else {
+		limit = 2
+	}
+	posts, err := s.db.GetPostsForUser(context.Background(),
+		database.GetPostsForUserParams{UserID: userId, Limit: int32(limit)})
+	if err != nil {
+		return err
+	}
+	for _, post := range posts {
+		fmt.Println(post.Title)
+		fmt.Println(post.Url)
+		fmt.Println("---")
+	}
+	return nil
+}
+
 func scrapeFeeds(s *state) {
 	feed, err := s.db.GetNextFeedToFetch(context.Background())
 	if err != nil {
@@ -208,6 +236,30 @@ func scrapeFeeds(s *state) {
 		return
 	}
 	for _, items := range feedInfo.Channel.Item {
-		fmt.Println(items.Title)
+		postID := uuid.New()
+		createdAt := time.Now()
+		updatedAt := time.Now()
+		formats := []string{time.RFC1123Z, time.RFC1123}
+		var pubtime sql.NullTime
+		for _, format := range formats {
+			t, err := time.Parse(format, items.PubDate)
+			if err == nil {
+				pubtime = sql.NullTime{Time: t, Valid: true}
+				break
+			}
+		}
+		description := sql.NullString{String: items.Description, Valid: items.Description != ""}
+		_, err = s.db.CreatePost(context.Background(),
+			database.CreatePostParams{ID: postID, CreatedAt: createdAt,
+				UpdatedAt: updatedAt, Title: items.Title, Url: items.Link,
+				Description: description, PublishedAt: pubtime,
+				FeedID: feed.ID})
+		if err != nil {
+			if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
+				// 23505 is the Postgres unique violation code - just continue
+				continue
+			}
+			log.Println("Couldn't create post", err)
+		}
 	}
 }
