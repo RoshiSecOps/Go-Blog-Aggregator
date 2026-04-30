@@ -183,3 +183,24 @@ func handlerFollows(s *state, cmd command, user database.User) error {
 	fmt.Println("Followed by: ", user.Name)
 	return nil
 }
+
+func scrapeFeeds(s *state) {
+	feed, err := s.db.GetNextFeedToFetch(context.Background())
+	if err != nil {
+		log.Println("Couldn't get next feed", err)
+		return
+	}
+	err = s.db.MarkFeedFetched(context.Background(), feed.ID)
+	if err != nil {
+		log.Println("Couldn't mark fetched feed", err)
+		return
+	}
+	feedInfo, err := fetchFeed(context.Background(), feed.Url)
+	if err != nil {
+		log.Println("Couldn't get feed data", err)
+		return
+	}
+	for _, items := range feedInfo.Channel.Item {
+		fmt.Println(items.Title)
+	}
+}
