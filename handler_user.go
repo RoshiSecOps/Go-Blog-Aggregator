@@ -77,12 +77,19 @@ func handlerUsers(s *state, cmd command) error {
 }
 
 func handlerFetchFeed(s *state, cmd command) error {
-	url := "https://www.wagslane.dev/index.xml"
-	feed, err := fetchFeed(context.Background(), url)
-	if err != nil {
-		log.Fatal(err)
+	if len(cmd.arguments) < 1 {
+		return fmt.Errorf("Pleaase provide a time between requests in the form 1s, 1m 1h, 1h2m, etc...")
 	}
-	fmt.Println(feed)
+	timeProvided := cmd.arguments[0]
+	fmt.Println("Collecting feeds every", timeProvided)
+	timeToRun, err := time.ParseDuration(timeProvided)
+	if err != nil {
+		return err
+	}
+	ticker := time.NewTicker(timeToRun)
+	for ; ; <-ticker.C {
+		scrapeFeeds(s)
+	}
 	return nil
 }
 
