@@ -32,28 +32,37 @@ Replace username and password with your PostgreSQL credentials.
 
 ## Usage
 Register and login
+```bash
 Go-Blog-Aggregator register <username>
 Go-Blog-Aggregator login <username>
-
+```
 Add and follow feeds
 ### Add a new RSS feed
+```bash
 Go-Blog-Aggregator addfeed "Boot.dev Blog" https://blog.boot.dev/index.xml
-
+```
 ### Follow an existing feed
+```bash
 Go-Blog-Aggregator follow https://blog.boot.dev/index.xml
-
+```
 ### See all feeds you follow
+```bash
 Go-Blog-Aggregator following
-
+```
 ### Unfollow a feed
+```bash
 Go-Blog-Aggregator unfollow https://blog.boot.dev/index.xml
-
-Aggregate and browse posts
-### Start the aggregator (fetches feeds on an interval)
+```
+### Aggregate and browse posts
+- Start the aggregator (fetches feeds on an interval)
+```bash
 Go-Blog-Aggregator agg 30s
-
+```
 ### Browse your latest posts (defaults to 2)
+```bash
 Go-Blog-Aggregator browse
-
+```
 ### Browse with a custom limit
+```bash
 Go-Blog-Aggregator browse 10
+```
